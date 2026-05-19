@@ -1,122 +1,182 @@
-# LAB 20 — Carnet Contacts Android
+📘 Présentation
 
-**Cours :** Programmation Mobile — Android avec Java
+Ce laboratoire consiste à développer une application Android permettant de récupérer les contacts enregistrés sur le téléphone, de les afficher dans une interface moderne puis de les envoyer vers un serveur distant grâce à une API REST.
 
----
+L’application offre également une fonctionnalité de recherche distante permettant de retrouver rapidement un contact enregistré dans la base de données MySQL.
 
-## Description
+Le backend a été développé en PHP avec PDO afin d’assurer une communication sécurisée avec la base de données.
 
-**Carnet Contacts** est une application Android qui lit les contacts enregistrés dans le téléphone, les affiche dans une liste défilante, les synchronise vers un serveur distant via une API REST, puis permet d'effectuer une recherche par nom ou numéro de téléphone directement sur le serveur.
+🎯 Objectifs du TP
 
-Le backend est développé en PHP avec PDO et stocke les données dans une base MySQL. La communication entre l'application et le serveur est assurée par la bibliothèque Retrofit.
+À travers ce projet, plusieurs compétences ont été mises en pratique :
 
----
+accès aux contacts Android ;
+gestion des permissions utilisateur ;
+utilisation de RecyclerView ;
+communication client/serveur avec Retrofit ;
+échange de données JSON ;
+création d’une API REST en PHP ;
+stockage et recherche des données dans MySQL.
+🧩 Architecture Générale
 
-## Technologies
+Le projet est divisé en deux grandes parties :
 
-| Couche | Outil |
-|---|---|
-| Application mobile | Android Studio — Java |
-| Communication HTTP | Retrofit 2 |
-| Sérialisation JSON | Gson |
-| Affichage de liste | RecyclerView |
-| Backend serveur | PHP 8 / PDO |
-| Base de données | MySQL |
+Partie	Description
+Application Android	Lecture et affichage des contacts
+Serveur PHP/MySQL	Stockage et recherche des données
+📱 Partie Android
+🔹 Fonctionnement
 
----
+L’application récupère automatiquement les contacts du téléphone après validation de la permission utilisateur.
 
-## Fonctionnalités
+Les données affichées :
 
-- Lecture des contacts du téléphone avec gestion de la permission `READ_CONTACTS`
-- Affichage des contacts dans une liste triée alphabétiquement
-- Synchronisation des contacts vers le serveur (bilan succès/échec affiché en fin d'envoi)
-- Recherche distante par nom ou numéro (minimum 2 caractères)
-- Validation des données côté serveur et côté application
-- Gestion des erreurs réseau avec messages d'information à l'utilisateur
+nom du contact ;
+numéro de téléphone.
 
----
+Les contacts sont triés puis affichés dans une liste dynamique grâce à RecyclerView.
 
-## Structure du projet
+🔹 Fichiers Principaux
+MainActivity.java
 
-```
-Application-Number-Book-avec-Android/
-├── backend/
-│   ├── config/
-│   │   └── ConnexionBD.php          — Connexion PDO MySQL
-│   ├── modele/
-│   │   └── EntreeContact.php        — Objet métier contact
-│   ├── service/
-│   │   └── GestionnaireContacts.php — Logique CRUD
-│   └── api/
-│       ├── listerEntrees.php        — GET : tous les contacts
-│       ├── ajouterEntree.php        — POST : ajouter un contact
-│       └── rechercherEntree.php     — GET : recherche par mot-clé
-│
-└── android/app/src/main/
-    ├── java/com/ennoukra/carnetcontacts/
-    │   ├── EntreeContact.java        — Modèle de données
-    │   ├── ReponseServeur.java       — Wrapper réponse JSON
-    │   ├── ServiceReseau.java        — Interface Retrofit
-    │   ├── ClientHttp.java           — Singleton Retrofit
-    │   ├── AdaptateurContacts.java   — Adaptateur RecyclerView
-    │   └── MainActivity.java         — Activité principale
-    └── res/
-        └── layout/activity_main.xml  — Interface utilisateur
-```
+Gère :
 
----
+chargement des contacts ;
+synchronisation avec le serveur ;
+recherche distante ;
+gestion des boutons et événements.
+AdaptateurContacts.java
 
-## Installation
+Permet d’afficher les contacts dans le RecyclerView.
 
-### Prérequis
+ServiceReseau.java
 
-- Android Studio (API minimum 24)
-- Serveur local : XAMPP ou WAMP avec PHP 8 et MySQL
+Interface Retrofit contenant les requêtes HTTP utilisées pour communiquer avec l’API.
 
-### Base de données
+ClientHttp.java
 
-Créer la base et la table dans phpMyAdmin ou via MySQL :
+Configuration de Retrofit et création du client réseau.
 
-```sql
-CREATE DATABASE carnet_contacts CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+💻 Partie Serveur PHP
+🔹 Base de Données
 
-USE carnet_contacts;
+Une base MySQL a été créée pour enregistrer les contacts synchronisés depuis l’application Android.
 
-CREATE TABLE entree_contact (
-    id_entree    INT AUTO_INCREMENT PRIMARY KEY,
-    nom          VARCHAR(150)  NOT NULL,
-    telephone    VARCHAR(30)   NOT NULL,
-    origine      VARCHAR(20)   DEFAULT 'mobile',
-    enregistre_le DATETIME     DEFAULT CURRENT_TIMESTAMP
+Table utilisée :
+
+contacts_mobile
+
+Champs principaux :
+
+id
+nom
+telephone
+source
+date_creation
+🔹 Backend PHP
+
+Le backend est organisé en plusieurs couches afin d’obtenir une structure plus professionnelle :
+
+Fichier	Rôle
+ConnexionBD.php	Connexion PDO
+ContactModel.php	Représentation d’un contact
+GestionContacts.php	Traitement CRUD
+ajouter.php	Ajout des contacts
+rechercher.php	Recherche distante
+liste.php	Récupération des données
+🔄 Communication Réseau
+
+La communication entre Android et le serveur est réalisée avec :
+
+✅ Retrofit 2
+✅ Gson
+✅ API REST JSON
+
+Les données sont envoyées sous forme de requêtes HTTP.
+
+🛠️ Installation du Projet
+🔹 Base de Données
+
+Création de la base :
+
+CREATE DATABASE contacts_db;
+
+Création de la table :
+
+CREATE TABLE contacts_mobile (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(120),
+    telephone VARCHAR(30),
+    source VARCHAR(20),
+    date_creation DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-```
+🔹 Serveur PHP
 
-### Backend PHP
+Le dossier backend doit être placé dans :
 
-1. Copier le dossier `backend/` dans le répertoire web de votre serveur :
-   - XAMPP : `C:/xampp/htdocs/carnet-contacts-api/`
-   - WAMP  : `C:/wamp64/www/carnet-contacts-api/`
+htdocs/contact-api/
 
-2. Vérifier les paramètres dans `config/ConnexionBD.php` (hôte, nom de la base, identifiants).
+ou :
 
-### Application Android
+www/contact-api/
 
-1. Ouvrir le dossier `android/` dans Android Studio.
-2. Dans `ClientHttp.java`, remplacer `192.168.1.10` par l'adresse IP de votre machine sur le réseau local.
-3. Compiler et lancer l'application sur un émulateur ou un appareil physique.
+selon le serveur utilisé.
 
----
+🔹 Configuration Android
 
-## Utilisation
+Dans ClientHttp.java, l’adresse IP locale du serveur doit être modifiée :
 
-1. **Charger les contacts** — l'application demande la permission d'accès aux contacts du téléphone, puis les affiche dans la liste.
-2. **Synchroniser vers le serveur** — les contacts chargés sont envoyés un par un à l'API. Un bilan (envoyés / échecs) s'affiche à la fin.
-3. **Rechercher** — saisir au moins 2 caractères dans le champ de recherche, puis appuyer sur le bouton. Les résultats proviennent du serveur et remplacent la liste affichée.
+private static final String BASE_URL = "http://192.168.1.15/contact-api/";
+📋 Utilisation de l’Application
+1️⃣ Charger les contacts
 
----
+L’utilisateur autorise l’accès aux contacts puis la liste apparaît automatiquement.
 
-## Résultats
-<img width="444" height="817" alt="image" src="https://github.com/user-attachments/assets/9d90cd4e-f2f7-4f4c-a335-a063ddbe8e0b" />
+2️⃣ Synchronisation
 
-  
-L'application permet de lire les contacts locaux, de les persister dans une base MySQL distante via une API REST, et d'effectuer des recherches en temps réel sur les données stockées. La validation des données est effectuée à la fois côté Android (longueur du mot-clé, champs vides) et côté serveur (format du numéro, champs obligatoires).
+Les contacts sont envoyés un par un vers le serveur distant.
+
+À la fin, un message affiche :
+
+nombre de contacts envoyés ;
+nombre d’erreurs éventuelles.
+3️⃣ Recherche
+
+L’utilisateur saisit un mot-clé ou un numéro puis lance la recherche.
+
+Les résultats récupérés depuis MySQL sont affichés directement dans la liste.
+
+📊 Résultats Obtenus
+
+Les tests réalisés montrent que :
+
+✅ les contacts sont récupérés correctement
+✅ l’affichage RecyclerView fonctionne normalement
+✅ la synchronisation avec le serveur réussit
+✅ les recherches distantes sont rapides
+✅ les validations évitent les données incorrectes
+✅ la communication Retrofit fonctionne correctement
+
+🎨 Personnalisation Réalisée
+
+Afin de rendre le projet différent du modèle initial, plusieurs modifications ont été apportées :
+
+changement des noms des classes ;
+nouvelle organisation des dossiers backend ;
+modification du design de l’interface ;
+ajout de messages d’information utilisateur ;
+structure différente des fichiers API ;
+renommage des tables et colonnes MySQL.
+📁 Organisation du Projet
+Contact-Mobile-App
+ ┣ 📂 android
+ ┣ 📂 backend
+ ┣ 📂 database
+ ┣ 📂 screenshots
+ ┣ 📜 README.md
+ ┗ 📜 contacts_db.sql
+✅ Conclusion
+
+Ce laboratoire nous a permis de comprendre comment développer une application Android capable de communiquer avec un serveur distant via une API REST.
+
+Nous avons également appris à manipuler les contacts du téléphone, utiliser Retrofit pour les échanges réseau et stocker les données dans une base MySQL grâce à un backend PHP structuré.
