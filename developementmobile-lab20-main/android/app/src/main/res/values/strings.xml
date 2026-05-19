@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Carnet Contacts</string>
+    <string name="btn_charger">Charger les contacts</string>
+    <string name="btn_synchroniser">Synchroniser vers le serveur</string>
+    <string name="btn_chercher">Rechercher</string>
+    <string name="hint_recherche">Rechercher par nom ou numéro (min. 2 car.)</string>
+</resources>

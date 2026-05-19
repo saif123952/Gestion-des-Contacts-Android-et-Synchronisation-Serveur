@@ -1,0 +1,7 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.CarnetContacts" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Personnalisation du thème clair ici si besoin -->
+    </style>
+
+    <style name="Theme.CarnetContacts" parent="Base.Theme.CarnetContacts" />
+</resources>
